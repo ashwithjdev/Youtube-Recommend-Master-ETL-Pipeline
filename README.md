@@ -15,6 +15,9 @@ In this project, I build a simple data pipeline following the ETL(extract - tran
  - **Serving**: The data was used for visualization using `Metabase` and creating a video recommendation application using `Streamlit`
  - **package and orchestrator**: Use `Docker` to containerize and package projects and `Dagster` to coordinate `assets` across different tasks
 
+## ⚡ Workflow
+<img src="./public/images/Data_flow_youtube.png" style="width: 100%;">
+
 ## 📦 Technologies
  - `MySQL`
  - `Youtube API`
@@ -101,4 +104,3 @@ To run the project in your local environment, follow these steps:
 9. Open [http://localhost:8501](http://localhost:8501) to try out the `video recommendation` app on `Streamlit`
 
 ## 🍿 Video
-[Screencast from 2024-06-16 22-00-03.webm](https://github.com/longNguyen010203/Youtube-ETL-Pipeline/assets/168116061/33eb73b4-f4f0-48f6-9c2d-a4614e1f4ec5)
