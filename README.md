@@ -16,7 +16,7 @@ In this project, I build a simple data pipeline following the ETL(extract - tran
  - **package and orchestrator**: Use `Docker` to containerize and package projects and `Dagster` to coordinate `assets` across different tasks
 
 ## ⚡ Workflow
-<img src="./public/images/Data_flow_youtube.png" style="width: 100%;">
+<img src="./public/images/Data_flow_youtube2.png" style="width: 100%;">
 
 ## 📦 Technologies
  - `MySQL`
