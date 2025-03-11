@@ -1,0 +1,92 @@
+"""creation Overview"""
+
+import googleapiclient.discovery
+import pandas as pd
+from datetime import datetime
+
+# --- Configuration ---
+API_KEY = "YOUR_YOUTUBE_API_KEY"  # Replace with your API key
+SEARCH_QUERY = "python tutorial"  # Example search term
+OUTPUT_FILE = "youtube_data.csv"
+
+# --- Extract ---
+def extract_youtube_data(api_key, query, max_results=10):
+    # Build the YouTube API client
+    youtube = googleapiclient.discovery.build("youtube", "v3", developerKey=api_key)
+    
+    # Search for videos
+    request = youtube.search().list(
+        part="snippet",
+        q=query,
+        type="video",
+        maxResults=max_results
+    )
+    response = request.execute()
+    
+    # Extract relevant data
+    video_data = []
+    for item in response["items"]:
+        video_info = {
+            "video_id": item["id"]["videoId"],
+            "title": item["snippet"]["title"],
+            "description": item["snippet"]["description"],
+            "published_at": item["snippet"]["publishedAt"]
+        }
+        video_data.append(video_info)
+    
+    # Fetch video statistics (views, likes, etc.)
+    video_ids = [item["video_id"] for item in video_data]
+    stats_request = youtube.videos().list(
+        part="statistics",
+        id=",".join(video_ids)
+    )
+    stats_response = stats_request.execute()
+    
+    # Combine snippet and statistics
+    for i, stat in enumerate(stats_response["items"]):
+        video_data[i]["view_count"] = stat["statistics"].get("viewCount", 0)
+    
+    return video_data
+
+# --- Transform ---
+def transform_data(raw_data):
+    # Convert to DataFrame
+    df = pd.DataFrame(raw_data)
+    
+    # Clean and transform
+    df = df.dropna(subset=["title"])  # Remove rows with missing titles
+    df["view_count"] = pd.to_numeric(df["view_count"], errors="coerce").fillna(0).astype(int)  # Convert views to integer
+    df["published_at"] = pd.to_datetime(df["published_at"])  # Convert to datetime
+    df["title"] = df["title"].str.strip()  # Remove leading/trailing whitespace
+    
+    # Add a new column (e.g., data extraction date)
+    df["extracted_date"] = datetime.now().strftime("%Y-%m-%d")
+    
+    return df
+
+# --- Load ---
+def load_data(transformed_data, output_file):
+    # Save to CSV
+    transformed_data.to_csv(output_file, index=False)
+    print(f"Data successfully saved to {output_file}")
+
+# --- ETL Pipeline ---
+def run_etl_pipeline():
+    print("Starting ETL pipeline...")
+    
+    # Extract
+    print("Extracting data from YouTube...")
+    raw_data = extract_youtube_data(API_KEY, SEARCH_QUERY)
+    
+    # Transform
+    print("Transforming data...")
+    transformed_data = transform_data(raw_data)
+    
+    # Load
+    print("Loading data to CSV...")
+    load_data(transformed_data, OUTPUT_FILE)
+    
+    print("ETL pipeline completed!")
+
+if __name__ == "__main__":
+    run_etl_pipeline()
